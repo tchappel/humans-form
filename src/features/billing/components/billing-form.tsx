@@ -16,13 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { type BillingFormData, billingSchema } from "../schema";
 
 export function BillingForm() {
-  const [entity, setEntity] = useState<BillingFormData["entity"]>("company");
-  const [country, setCountry] = useState<BillingFormData["country"]>("italy");
   const form = useForm<BillingFormData>({
     resolver: zodResolver(billingSchema),
     defaultValues: {
@@ -37,6 +34,9 @@ export function BillingForm() {
       fiscalCode: "",
     },
   });
+
+  const entity = useWatch({ control: form.control, name: "entity" });
+  const country = useWatch({ control: form.control, name: "country" });
 
   function onSubmit(data: BillingFormData) {
     console.log("Form submitted:", data);
@@ -57,10 +57,7 @@ export function BillingForm() {
                 <FieldLabel htmlFor="entity">Purchasing as</FieldLabel>
                 <RadioGroup
                   value={field.value}
-                  onValueChange={(value: "company" | "private") => {
-                    field.onChange(value);
-                    setEntity(value);
-                  }}
+                  onValueChange={field.onChange}
                   className="flex gap-4"
                 >
                   <div className="flex items-center space-x-2">
@@ -172,13 +169,7 @@ export function BillingForm() {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="country">Country</FieldLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    setCountry(value as BillingFormData["country"]);
-                  }}
-                >
+                <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id="country" aria-invalid={fieldState.invalid}>
                     <SelectValue placeholder="Select country" />
                   </SelectTrigger>
