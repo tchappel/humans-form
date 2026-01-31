@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Field,
   FieldError,
   FieldGroup,
@@ -16,10 +22,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { type BillingFormData, billingSchema } from "../schema";
 
 export function BillingForm() {
+  const [submittedData, setSubmittedData] = useState<BillingFormData | null>(
+    null,
+  );
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const form = useForm<BillingFormData>({
     resolver: zodResolver(billingSchema),
     defaultValues: {
@@ -39,8 +51,9 @@ export function BillingForm() {
   const country = useWatch({ control: form.control, name: "country" });
 
   function onSubmit(data: BillingFormData) {
-    console.log("Form submitted:", data);
-    alert("SUCCESS !!!");
+    console.log("Submitted: ", data);
+    setDialogOpen(true);
+    setSubmittedData(data);
   }
 
   return (
@@ -262,6 +275,16 @@ export function BillingForm() {
           Submit
         </Button>
       </form>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Form Submitted Successfully</DialogTitle>
+          </DialogHeader>
+          <pre className="mt-4 rounded-lg bg-muted p-4 text-sm overflow-auto max-h-96">
+            <code>{JSON.stringify(submittedData, null, 2)}</code>
+          </pre>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
