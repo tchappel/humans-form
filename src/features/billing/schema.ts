@@ -22,12 +22,11 @@ export const billingSchema = z
       .string()
       .trim()
       .refine((val) => {
-        if (!val) return true; // optional
-        // Check if it's valid SDI (7 alphanumeric) OR valid PEC (email)
+        if (!val) return true;
         const isSdi = /^[A-Z0-9]{7}$/.test(val);
-        const isPec = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+        const isPec = z.email().safeParse(val).success;
         return isSdi || isPec;
-      }, "Must be either a valid SDI code (7 alphanumeric) or PEC email")
+      }, "Must be either a valid SDI code or PEC")
       .optional()
       .or(z.literal("")),
     fiscalCode: z
